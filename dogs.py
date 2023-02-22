@@ -1,8 +1,9 @@
 import pytest
 import requests
 from jsonschema import validate
+from http import HTTPStatus
 
-expected_code = 200
+expected_code = HTTPStatus.OK
 
 
 def test_all_breeds():
@@ -11,8 +12,7 @@ def test_all_breeds():
     r = requests.get('https://dog.ceo/api/breeds/list/all')
 
     # Проверка cтатус кода
-    status_dog = r.status_code
-    assert status_dog == expected_code
+    assert r.status_code == expected_code
 
     # Проверка схемы
     schema_dog = {
@@ -26,11 +26,9 @@ def test_random_image():
 
     # Выполнить запрос на https://dog.ceo/api/breeds/image/random
     r = requests.get('https://dog.ceo/api/breeds/image/random')
-    status_dog = r.status_code
 
     # Проверка статус кода
-    status_dog = r.status_code
-    assert status_dog == expected_code
+    assert r.status_code == expected_code
 
     # Проверить что схема соответсвтует указанному формату:
     schema_dog = {
@@ -44,7 +42,7 @@ def test_random_image():
 def test_dog_multiple_images(number_of_images):
 
     # Выполнить запрос на https://dog.ceo/api/breeds/image/random/3
-    uri = f'https://dog.ceo/api/breeds/image/random/{str(number_of_images)}'
+    uri = f'https://dog.ceo/api/breeds/image/random/{number_of_images}'
     r = requests.get(uri)
 
     # Проверить статус код
@@ -62,12 +60,11 @@ def test_dog_multiple_images(number_of_images):
     assert len(parsed_response['message']) == number_of_images
 
 
-@pytest.mark.xfail(strict=True)
 @pytest.mark.parametrize('number_of_images', [51])
 def test_dog_multiple_images_maxnumber(number_of_images):
 
     # Выполнить запрос на https://dog.ceo/api/breeds/image/random/3
-    uri = f'https://dog.ceo/api/breeds/image/random/{str(number_of_images)}'
+    uri = f'https://dog.ceo/api/breeds/image/random/{number_of_images}'
     r = requests.get(uri)
 
     # Проверить статус код
@@ -82,7 +79,7 @@ def test_dog_multiple_images_maxnumber(number_of_images):
 
     # Проверить что максимальное количество картинок в ответе = 50
     parsed_response = r.json()
-    assert len(parsed_response['message']) == number_of_images
+    assert len(parsed_response['message']) == number_of_images-1
 
 
 @pytest.mark.parametrize('breed', ['hound', 'akita', 'bulldog'])
