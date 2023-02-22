@@ -7,9 +7,9 @@ expected_statuscode = 200
 
 def test_single_brewery():
     # Делаем запрос
-    request = requests.get('https://api.openbrewerydb.org/breweries/madtree-brewing-cincinnati')
+    r = requests.get('https://api.openbrewerydb.org/breweries/madtree-brewing-cincinnati')
     # Проверяем статус-код
-    assert request.status_code == expected_statuscode
+    assert r.status_code == expected_statuscode
     # Задаем схему для валидации
     schema = {
         'type': 'object',
@@ -34,28 +34,28 @@ def test_single_brewery():
         },
         'required': ['id', 'name', 'brewery_type', 'street', 'state', 'city']}
     # Валидируем схему
-    validate(instance=request.json(), schema=schema)
+    validate(instance=r.json(), schema=schema)
 
 
 @pytest.mark.parametrize('number_of_breweries', [1, 2, 3, 10, 50])
 def test_brewery_list(number_of_breweries):
     # Делаем запрос
-    request = requests.get(f'https://api.openbrewerydb.org/breweries?per_page={number_of_breweries}')
+    r = requests.get(f'https://api.openbrewerydb.org/breweries?per_page={number_of_breweries}')
     # Проверяем статус-код
-    assert request.status_code == expected_statuscode
+    assert r.status_code == expected_statuscode
     # Проверяем что количество пивнушек в ответе соответствует значению параметра per_page в урле
-    assert (len(request.json())) == number_of_breweries
+    assert (len(r.json())) == number_of_breweries
 
 
 @pytest.mark.xfail(strict=True)
 @pytest.mark.parametrize('number_of_breweries', [-1, 51])
 def test_brewery_list_negative(number_of_breweries):
     # Делаем запрос
-    request = requests.get(f'https://api.openbrewerydb.org/breweries?per_page={number_of_breweries}')
+    r = requests.get(f'https://api.openbrewerydb.org/breweries?per_page={number_of_breweries}')
     # Проверяем статус-код
-    assert request.status_code == expected_statuscode
+    assert r.status_code == expected_statuscode
     # Проверяем что количество пивнушек в ответе соответствует значению параметра per_page в урле
-    assert (len(request.json())) == number_of_breweries
+    assert (len(r.json())) == number_of_breweries
 
 
 @pytest.mark.parametrize('city, number_of_breweries',
@@ -66,9 +66,9 @@ def test_brewery_list_negative(number_of_breweries):
                          ])
 def test_brewery_by_city(city, number_of_breweries):
     # Делаем запрос
-    request = requests.get(f'https://api.openbrewerydb.org/breweries?by_city={city}&per_page={number_of_breweries}')
+    r = requests.get(f'https://api.openbrewerydb.org/breweries?by_city={city}&per_page={number_of_breweries}')
     # Проверяем статус-код
-    assert request.status_code == expected_statuscode
+    assert r.status_code == expected_statuscode
     # Задаем схему для валидации
     schema = {
         'type': 'array',
@@ -95,16 +95,16 @@ def test_brewery_by_city(city, number_of_breweries):
             "required": ["id", "name", "brewery_type", "street", "state", "city"]
         }}
     # Валидируем схему
-    validate(instance=request.json(), schema=schema)
-    assert (len(request.json())) == number_of_breweries
+    validate(instance=r.json(), schema=schema)
+    assert (len(r.json())) == number_of_breweries
 
 
 @pytest.mark.parametrize('para', ['dog', 'pasta'])
 def test_brewery_search_autocomplete(para):
     # Делаем запрос
-    request = requests.get(f'https://api.openbrewerydb.org/breweries/autocomplete?query={para}')
+    r = requests.get(f'https://api.openbrewerydb.org/breweries/autocomplete?query={para}')
     # Проверяем статус-код
-    assert request.status_code == expected_statuscode
+    assert r.status_code == expected_statuscode
     # Задаем схему
     schema = {
         'type': 'array',
@@ -115,6 +115,6 @@ def test_brewery_search_autocomplete(para):
             "required": ["id", "name"]
             }}
     # Валидируем схему
-    validate(instance=request.json(), schema=schema)
+    validate(instance=r.json(), schema=schema)
 
 
